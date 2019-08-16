@@ -1,6 +1,7 @@
 const Firebird = require('node-firebird-dev');
 const Options = require('./flagParams').options();
 const convertBufferArray = require('./convertBufferArray');
+const convertDate = require('./convertDate');
 
 const sqlQuery = param => {
   return (req, res) => {
@@ -57,6 +58,9 @@ function convertRow(row) {
   let newRow = {};
   Object.keys(row).forEach(el => {
     newRow[el] = convertBufferArray(row[el]);
+    if (row[el] instanceof Date) {
+      newRow[el] = convertDate(row[el]);
+    }
   });
 
   return newRow;
