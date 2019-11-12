@@ -35,7 +35,6 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "bottleneck": "^2.19.5",
     "compression": "^1.7.3",
     "dayjs": "^1.8.15",
     "express": "^4.16.4",

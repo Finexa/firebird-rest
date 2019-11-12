@@ -2,10 +2,10 @@ const Firebird = require('node-firebird-dev');
 const Options = require('./flagParams').options();
 const convertBufferArray = require('./convertBufferArray');
 const convertDate = require('./convertDate');
-const Bottleneck = require('bottleneck');
 
 const sqlQuery = param => {
   return (req, res) => {
+    let result = [];
     const properties = req[param];
     
     Options.database = properties.database || Options.database;
@@ -19,43 +19,23 @@ const sqlQuery = param => {
     if (!sql) {
       return res.send(['No valid SQL query found! Please enter a valid SQL query.']);
     }
-    
-    queryWithLimiter(sql, params)
-      .then((result) => res.send(result))
-      .catch((err) => {
-        res.status(400); // BAD REQUEST
-        res.send(`\n${err.message}\n`);
-      });
-    
-  };
-};
 
-const limiter = new Bottleneck({
-  maxConcurrent: 20,
-});
-
-function queryWithLimiter(sql, params) {
-  return limiter.schedule(() => query(sql, params));
-}
-
-function query(sql, params) {
-  return new Promise((resolve, reject) => {
     Firebird.attach(Options, (err, db) => {
       if (err) {
         db.detach();
-        reject(err);
+        res.status(400); // BAD REQUEST
+        return res.send(`\n${err.message}\n`);
       }
 
       db.query(sql, params, (err, data) => {
         if (err) {
           db.detach();
-          reject(err);
+          res.status(400); // BAD REQUEST
+          return res.send(`\n${err.message}\n`);
         }
         db.detach();
 
         if (data) {
-          let result = [];
-
           if (Array.isArray(data)) {
             // CONVERT RAW QUERY RESULT AND RETURN JSON
             data.forEach(row => {
@@ -66,13 +46,13 @@ function query(sql, params) {
             const newRow = convertRow(data);
             result = newRow;
           }
-
-          return resolve(result);
         }
+
+        return res.send(result);
       });
     });
-  })
-}
+  };
+};
 
 function convertRow(row) {
   let newRow = {};
