@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-
-const express = require('express');
 const sqlQuery = require('./utils/sqlQuery');
 const port = require('./utils/flagParams').serverPort();
 const app = require('fastify')();
