@@ -1,7 +1,7 @@
 const Firebird = require('node-firebird-dev');
 const Options = require('./flagParams').options();
-const convertBufferArray = require('./convertBufferArray');
 const convertDate = require('./convertDate');
+const bufferJson = require('buffer-json');
 
 const sqlQuery = param => {
   return (req, res) => {
@@ -22,6 +22,7 @@ const sqlQuery = param => {
 
     Firebird.attach(Options, (err, db) => {
       if (err) {
+        console.error(err);
         db.detach();
         res.status(400); // BAD REQUEST
         return res.send(`\n${err.message}\n`);
@@ -48,7 +49,9 @@ const sqlQuery = param => {
           }
         }
 
-        return res.send(result);
+        const jsonString = bufferJson.stringify(result);
+
+        return res.send(JSON.parse(jsonString));
       });
     });
   };
@@ -57,7 +60,7 @@ const sqlQuery = param => {
 function convertRow(row) {
   let newRow = {};
   Object.keys(row).forEach(el => {
-    newRow[el] = convertBufferArray(row[el]);
+    newRow[el] = row[el];
     if (row[el] instanceof Date) {
       newRow[el] = convertDate(row[el]);
     }

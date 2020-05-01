@@ -34,6 +34,7 @@
     "uninstall-windows-service": "winser -r"
   },
   "dependencies": {
+    "buffer-json": "^2.0.0",
     "dayjs": "^1.8.15",
     "fastify": "^2.12.0",
     "flags": "^0.1.3",
