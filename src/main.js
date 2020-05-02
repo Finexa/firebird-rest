@@ -11,4 +11,4 @@ app.addContentTypeParser('application/json', { parseAs: 'string' }, async (req, 
 app.post('/', sqlQuery('body')); // parse SQL queries via http POST request
 
 // RUN FIREBIRD SERVER
-app.listen(port, () => console.log(`Firebird Server up and running on\nhttp://localhost:${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`Firebird Server up and running on\nhttp://localhost:${port}`));
