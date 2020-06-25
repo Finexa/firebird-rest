@@ -23,7 +23,7 @@ const proxy = require('redbird')({
   ssl: {
     port: 443
   }
-});;
+});
 
 proxy.register('firebird.finexa.no', `http://127.0.0.1:${port}`, {
   ssl: {
