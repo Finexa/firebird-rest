@@ -29,7 +29,7 @@ proxy.register('firebird.finexa.no', `http://127.0.0.1:${port}`, {
   ssl: {
     letsencrypt: {
       email: 'felix@finexa.no',
-      production: false,
+      production: true,
     },
   },
 });
