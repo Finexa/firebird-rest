@@ -2,6 +2,7 @@ const Firebird = require('node-firebird-dev');
 const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
+const parseDateStrings = require('./parseDateStrings');
 
 const sqlQuery = param => {
   return (req, res) => {
@@ -14,7 +15,7 @@ const sqlQuery = param => {
     Options.role = properties.role || Options.role;
 
     const sql = properties.sql;
-    const params = properties.params;
+    const params = parseDateStrings(properties.params);
 
     if (!sql) {
       return res.send(['No valid SQL query found! Please enter a valid SQL query.']);
