@@ -39,7 +39,7 @@
     "fastify": "^2.14.0",
     "flags": "^0.1.3",
     "moment": "^2.29.0",
-    "node-firebird-dev": "git+https://git@github.com/Finexa/node-firebird.git#8ca4782",
+    "node-firebird-dev": "git+https://git@github.com/Finexa/node-firebird#022ce8244d5c0c9cc1fcf9469100b3e2e08813b7",
     "redbird": "^0.10.0",
     "winser": "^1.0.3"
   }
