@@ -1,4 +1,4 @@
-const Firebird = require('node-firebird-dev');
+const Firebird = require('node-firebird');
 const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
