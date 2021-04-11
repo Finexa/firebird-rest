@@ -40,7 +40,6 @@
     "flags": "^0.1.3",
     "moment": "^2.29.0",
     "node-firebird": "git+https://git@github.com/Finexa/node-firebird.git#096b036",
-    "redbird": "^0.10.0",
     "winser": "^1.0.3"
   }
 }

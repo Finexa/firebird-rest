@@ -12,12 +12,12 @@ flags.parse();
 
 const options = () => {
   return {
-    host: flags.get('h'),
-    port: flags.get('p'),
-    database: flags.get('db'),
-    user: flags.get('u'),
-    password: flags.get('pw'),
-    role: flags.get('r')
+    host: process.env.FIREBIRD_HOST || flags.get('h'),
+    port: process.env.FIREBIRD_PORT || flags.get('p'),
+    database: process.env.FIREBIRD_DATABASE || flags.get('db'),
+    user: process.env.FIREBIRD_USER || flags.get('u'),
+    password: process.env.FIREBIRD_PASSWORD || flags.get('pw'),
+    role: process.env.FIREBIRD_ROLE || flags.get('r')
   };
 };
 
