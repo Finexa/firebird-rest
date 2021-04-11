@@ -3,42 +3,45 @@ version: "3"
 services:
   web:
     build: .
+    restart: unless-stopped:5
     expose:
      - 4444
     environment:
       HTTP_PORT: 4444
       VIRTUAL_HOST: firebird.finexa.no
-      FIREBIRD_HOST: 10.180.2.4
-#     LETSENCRYPT_HOST: firebird.finexa.no
-#     LETSENCRYPT_EMAIL: "it-support@finexa.no"
+      FIREBIRD_HOST: host.docker.internal
+      LETSENCRYPT_HOST: firebird.finexa.no
+      LETSENCRYPT_EMAIL: "it-support@finexa.no"
     networks:
       service_network:
 
   nginx-proxy:
     image: jwilder/nginx-proxy
+    restart: unless-stopped:5 
     ports:
       - 80:80
-#     - 443:443
+      - 443:443
     container_name: nginx-proxy
     networks:
       service_network:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-#     - nginx-certs:/etc/nginx/certs
+      - nginx-certs:/etc/nginx/certs
       - nginx-vhost:/etc/nginx/vhost.d
       - nginx-html:/usr/share/nginx/html
 
-# nginx-proxy-letsencrypt:
-#   image: jrcs/letsencrypt-nginx-proxy-companion
-#   environment:
-#     NGINX_PROXY_CONTAINER: "nginx-proxy"
-#   networks:
-#     service_network:
-#   volumes:
-#     - /var/run/docker.sock:/var/run/docker.sock:ro
-#     - nginx-certs:/etc/nginx/certs
-#     - nginx-vhost:/etc/nginx/vhost.d
-#     - nginx-html:/usr/share/nginx/html
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped:5 
+    environment:
+      NGINX_PROXY_CONTAINER: "nginx-proxy"
+    networks:
+      service_network:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
 
 networks:
   service_network:
