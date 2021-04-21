@@ -6,11 +6,9 @@ RUN apt-get install -y git
 # Create app directory
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY . .
 
 RUN npm ci
-
-COPY . .
 
 EXPOSE 4444
 

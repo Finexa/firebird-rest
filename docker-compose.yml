@@ -3,10 +3,11 @@ version: "3"
 services:
   web:
     build: .
-    restart: unless-stopped:5
+    restart: unless-stopped
     expose:
      - 4444
     environment:
+      TZ: Europe/Oslo
       HTTP_PORT: 4444
       VIRTUAL_HOST: firebird.finexa.no
       FIREBIRD_HOST: host.docker.internal
@@ -17,7 +18,7 @@ services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy
-    restart: unless-stopped:5 
+    restart: unless-stopped
     ports:
       - 80:80
       - 443:443
@@ -32,7 +33,7 @@ services:
 
   nginx-proxy-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: unless-stopped:5 
+    restart: unless-stopped
     environment:
       NGINX_PROXY_CONTAINER: "nginx-proxy"
     networks:
