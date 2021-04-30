@@ -13,6 +13,7 @@ services:
       FIREBIRD_HOST: host.docker.internal
       LETSENCRYPT_HOST: firebird.finexa.no
       LETSENCRYPT_EMAIL: "it-support@finexa.no"
+      FIREBIRD_SHARED_KEY: ${FIREBIRD_SHARED_KEY}
     networks:
       service_network:
 
