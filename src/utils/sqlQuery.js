@@ -14,6 +14,11 @@ const sqlQuery = param => {
     Options.password = properties.password || Options.password;
     Options.role = properties.role || Options.role;
 
+    if (properties.sharedKey !== process.env['FIREBIRD_SHARED_KEY']) {
+      res.status(403);
+      res.send('Invalid shared credentials');
+    }
+
     const isTransaction = properties.isTransaction;
     const statements = properties.statements;
 
