@@ -1,19 +1,16 @@
 version: "3"
 
 services:
-  web:
-    build: .
+  firebird-rest-relay:
+    image: alpine/socat
     restart: unless-stopped
-    expose:
-     - 4444
+    depends_on:
+      - nginx-proxy
+    command: "TCP-LISTEN:5555,fork,reuseaddr TCP:host.docker.internal:4444"
     environment:
-      TZ: Europe/Oslo
-      HTTP_PORT: 4444
       VIRTUAL_HOST: firebird.finexa.no
-      FIREBIRD_HOST: host.docker.internal
       LETSENCRYPT_HOST: firebird.finexa.no
       LETSENCRYPT_EMAIL: "it-support@finexa.no"
-      FIREBIRD_SHARED_KEY: ${FIREBIRD_SHARED_KEY}
     networks:
       service_network:
 

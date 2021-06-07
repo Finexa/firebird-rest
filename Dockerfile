@@ -1,4 +1,4 @@
-from node:12.22-slim
+from node:14.17-slim
 
 RUN apt-get update
 RUN apt-get install -y git
