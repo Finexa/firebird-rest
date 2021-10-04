@@ -64,6 +64,8 @@ const sqlQuery = param => {
               res.status(200);
               res.send('OK');
             }
+
+            db.detach();
           })
         })
       } else {
