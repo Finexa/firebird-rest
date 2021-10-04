@@ -3,16 +3,6 @@ const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
 const parseDateStrings = require('./parseDateStrings');
-const exitHook = require('exit-hook');
-
-const pool = Firebird.pool(100, Options);
-
-const errorLogger = (err) => {
-  if (err) {
-    console.error('Error ocurred during detach');
-    console.error(err); 
-  }
-}
 
 const sqlQuery = param => {
   return (req, res) => {
@@ -43,12 +33,11 @@ const sqlQuery = param => {
     }
 
 
-    pool.get((err, db) => {
-      console.log(pool.dbinuse);
+    Firebird.attach(Options, (err, db) => {
       if (err) {
         console.error(err);
         if (db) {
-          db.detach(errorLogger);
+          db.detach()
         }
         res.status(400); // BAD REQUEST
         return res.send(`\n${err.message}\n`);
@@ -57,7 +46,7 @@ const sqlQuery = param => {
       if (isTransaction) {
         db.transaction(Firebird.ISOLATION_REPEATABLE_READ, async (err, transaction) => {
           if (err) {
-            db.detach(errorLogger);
+            db.detach();
             res.status(400); // BAD REQUEST
             return res.send(`\n${err.message}\n`);
           }
@@ -81,12 +70,12 @@ const sqlQuery = param => {
         const params = parseDateStrings(properties.params);
         const sql = properties.sql;
         db.query(sql, params, (err, data) => {
-          db.detach(errorLogger);
-
           if (err) {
+            db.detach();
             res.status(400); // BAD REQUEST
             return res.send(`\n${err.message}\n`);
           }
+          db.detach();
   
           if (data) {
             if (Array.isArray(data)) {
@@ -135,9 +124,5 @@ function convertRow(row) {
 
   return newRow;
 }
-
-exitHook(() => {
-  pool.destroy(errorLogger);
-})
 
 module.exports = sqlQuery;
