@@ -48,25 +48,37 @@ const sqlQuery = param => {
           if (err) {
             db.detach();
             res.status(400); // BAD REQUEST
-            return res.send(`\n${err.message}\n`);
+            return res.send(err.message);
           }
 
           for(const statement of statements) {
             const { params, sql } = statement;
-            await executeTransactionQuery(transaction, { params: parseDateStrings(params), sql });
+            try {
+              await executeTransactionQuery(transaction, { params: parseDateStrings(params), sql });
+            } catch(err) {
+              res.status(400);
+              res.send(err.message);
+              
+              db.detach();
+              return;
+            }
           }
 
           transaction.commit((err) => {
             if (err) {
               res.status(400);
-              res.send(`\n${err.message}\n`);
+              res.send(err.message);
+
+              transaction.rollback(() => {
+                db.detach();
+              });
             } else {
               res.status(200);
               res.send('OK');
-            }
 
-            db.detach();
-          })
+              db.detach();
+            }
+          });
         })
       } else {
         const params = parseDateStrings(properties.params);
