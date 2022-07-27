@@ -4,8 +4,11 @@ const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
 const parseDateStrings = require('./parseDateStrings');
 const exitHook = require('exit-hook');
+const logger = require('./logger')
 
 const Pool = Firebird.pool(50, Options);
+
+logger.logPoolActivity(Pool);
 
 const sqlQuery = param => {
   return (req, res) => {
@@ -29,7 +32,6 @@ const sqlQuery = param => {
         return res.send(['No valid SQL query found! Please enter a valid SQL query.']);
       }
     }
-
 
     Pool.get(function(err, db) {
       if (err) {
