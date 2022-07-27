@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+require('dotenv').config();
+
 const sqlQuery = require('./utils/sqlQuery');
 const port = require('./utils/flagParams').serverPort();
 const app = require('fastify')();
