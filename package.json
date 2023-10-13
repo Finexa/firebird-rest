@@ -20,7 +20,11 @@
   "author": "Marin Vitlov <marin.vitlov@gmail.com> (https://github.com/mvitlov/)",
   "license": "MIT",
   "scripts": {
-    "start": "node src/main.js",
+    "install-watchdog": "pm2 install ma-zal/pm2-watchdog",
+    "config-watchdog": "pm2 set pm2-watchdog:url-firebird-rest http://127.0.0.1:4243/health",
+    "setup-watchdog": "npm run install-watchdog && npm run config-watchdog",
+    "postinstall": "npm run setup-watchdog",
+    "start": "pm2 start",
     "install-windows-service": "winser -i",
     "uninstall-windows-service": "winser -r"
   },

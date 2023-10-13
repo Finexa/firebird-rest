@@ -4,20 +4,28 @@ const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
 const parseDateStrings = require('./parseDateStrings');
 const exitHook = require('exit-hook');
-const logger = require('./logger')
 
 const Pool = Firebird.pool(50, Options);
 
-logger.logPoolActivity(Pool);
 
-const sqlQuery = param => {
+const sqlQuery = (param) => {
   return (req, res) => {
     let result = [];
-    const properties = req[param];
+    let properties;
 
-    if (properties.sharedKey !== process.env['FIREBIRD_SHARED_KEY']) {
-      res.status(403);
-      res.send('Invalid shared credentials');
+    if (param === 'health') {
+      properties = {
+        isTransaction: false,
+        statements: undefined,
+        sql: 'SELECT NAVN FROM SYSTEM',
+      };
+    } else {
+      properties = req[param];
+
+      if (properties.sharedKey !== process.env['FIREBIRD_SHARED_KEY']) {
+        res.status(403);
+        res.send('Invalid shared credentials');
+      }
     }
 
     const isTransaction = properties.isTransaction;
@@ -91,22 +99,26 @@ const sqlQuery = param => {
           }
           db.detach();
 
-          if (data) {
-            if (Array.isArray(data)) {
-              // CONVERT RAW QUERY RESULT AND RETURN JSON
-              data.forEach(row => {
-                const newRow = convertRow(row);
-                result.push(newRow);
-              });
-            } else {
-              const newRow = convertRow(data);
-              result = newRow;
+          if (param === 'health') {
+            return res.send(JSON.stringify({ healthy: true }));
+          } else {
+            if (data) {
+              if (Array.isArray(data)) {
+                // CONVERT RAW QUERY RESULT AND RETURN JSON
+                data.forEach(row => {
+                  const newRow = convertRow(row);
+                  result.push(newRow);
+                });
+              } else {
+                const newRow = convertRow(data);
+                result = newRow;
+              }
             }
+  
+            const jsonString = bufferJson.stringify(result);
+  
+            return res.send(JSON.parse(jsonString));
           }
-
-          const jsonString = bufferJson.stringify(result);
-
-          return res.send(JSON.parse(jsonString));
         });
       }
     });

@@ -17,5 +17,7 @@ app.get('/', (req, res) => {
   res.send('Up and running');
 });
 
+app.get('/health', sqlQuery('health'));    
+
 // RUN FIREBIRD SERVER
 app.listen(port, '0.0.0.0', () => console.log(`Firebird Server up and running on\nhttp://localhost:${port}`));

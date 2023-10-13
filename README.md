@@ -73,6 +73,18 @@ AuthServer = Legacy_Auth
 WireCrypt = Disabled
 ```
 
+### PM2 with Watchdog
+
+To run with PM2 and watchdog run the following commands:
+
+```
+npx pm2 install ma-zal/pm2-watchdog
+npx pm2 set pm2-watchdog:url-firebird-rest http://127.0.0.1:4243/health
+npx pm2 start ecosystem.config.js
+```
+
+Logs will be available in ~\.pm2\logs
+
 ## License
 
 [MIT](/LICENSE)
