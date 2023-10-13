@@ -29,7 +29,6 @@
     "uninstall-windows-service": "winser -r"
   },
   "dependencies": {
-    "applicationinsights": "^2.3.3",
     "buffer-json": "^2.0.0",
     "dayjs": "^1.8.15",
     "dotenv": "^16.0.1",
