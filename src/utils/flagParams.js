@@ -14,8 +14,8 @@ const options = () => {
   return {
     host: process.env.FIREBIRD_HOST || flags.get('h'),
     port: process.env.FIREBIRD_PORT || flags.get('p'),
-    database: 'inkasso',
-    user: 'WEBPORTAL',
+    database: process.env.FIREBIRD_DATABASE || flags.get('db'),
+    user: process.env.FIREBIRD_USER || flags.get('u'),
     password: process.env.FIREBIRD_PASSWORD || flags.get('pw'),
     role: process.env.FIREBIRD_ROLE || flags.get('r')
   };
