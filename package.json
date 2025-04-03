@@ -24,7 +24,7 @@
     "config-watchdog": "pm2 set pm2-watchdog:url-firebird-rest http://127.0.0.1:4243/health",
     "setup-watchdog": "npm run install-watchdog && npm run config-watchdog",
     "postinstall": "npm run setup-watchdog",
-    "start": "pm2 start",
+    "start": "pm2 start pm2.config.js",
     "install-windows-service": "winser -i",
     "uninstall-windows-service": "winser -r"
   },
