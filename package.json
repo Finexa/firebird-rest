@@ -2,9 +2,9 @@
   "name": "firebird-rest-pool",
   "version": "0.0.2",
   "description": "REST Server for FirebirdSQL",
-  "main": "./src/main.js",
+  "main": "./src/main.ts",
   "bin": {
-    "firebird-rest-pool": "./src/main.js"
+    "firebird-rest-pool": "./src/main.ts"
   },
   "keywords": [
     "firebird",
@@ -29,6 +29,7 @@
     "uninstall-windows-service": "winser -r"
   },
   "dependencies": {
+    "@types/event-emitter": "^0.3.5",
     "buffer-json": "^2.0.0",
     "dayjs": "^1.8.15",
     "dotenv": "^16.0.1",
@@ -36,7 +37,7 @@
     "fastify": "^2.14.0",
     "flags": "^0.1.3",
     "moment": "^2.29.0",
-    "node-firebird": "git+https://git@github.com/Finexa/node-firebird.git#f22e9b7",
+    "node-firebird": "git+https://git@github.com/Finexa/node-firebird-latin1.git#64bb4fc",
     "winser": "^1.0.3"
   }
 }

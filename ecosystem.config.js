@@ -2,7 +2,7 @@ module.exports = {
     apps: [
       {
         name: "firebird-rest-01",
-        script: "src/main.js",
+        script: "src/main.ts",
         autorestart: true,
         max_memory_restart: "2G",
         env: {
@@ -14,7 +14,7 @@ module.exports = {
       },
       {
         name: "firebird-rest-02",
-        script: "src/main.js",
+        script: "src/main.ts",
         autorestart: true,
         max_memory_restart: "2G",
         env: {

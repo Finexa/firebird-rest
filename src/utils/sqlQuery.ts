@@ -97,27 +97,22 @@ const sqlQuery = (param) => {
             res.status(400); // BAD REQUEST
             return res.send(`\n${err.message}\n`);
           }
-          db.detach();
 
           if (param === 'health') {
+            db.detach();
             return res.send(JSON.stringify({ healthy: true }));
           } else {
-            if (data) {
-              if (Array.isArray(data)) {
-                // CONVERT RAW QUERY RESULT AND RETURN JSON
-                data.forEach(row => {
-                  const newRow = convertRow(row);
-                  result.push(newRow);
-                });
-              } else {
-                const newRow = convertRow(data);
-                result = newRow;
+            convertRows(data)
+              .finally(() => db.detach())
+              .then((result) => {
+              let jsonString = bufferJson.stringify(result);
+
+              if (jsonString === undefined) {
+                jsonString = '{}';
               }
-            }
-  
-            const jsonString = bufferJson.stringify(result);
-  
-            return res.send(JSON.parse(jsonString));
+
+              res.send(jsonString);
+            });
           }
         });
       }
@@ -139,18 +134,62 @@ function executeTransactionQuery(transaction, statement) {
   });
 }
 
-function convertRow(row) {
+async function convertRows(data) {
+  let result: any;
+  if (data) {
+    if (Array.isArray(data)) {
+      result = [];
+      // CONVERT RAW QUERY RESULT AND RETURN JSON
+      for (const row of data) {
+        const newRow = await convertRow(row);
+        result.push(newRow);
+      }
+    } else {
+      const newRow = await convertRow(data) as any[];
+      result = newRow;
+    }
+  }
+
+  return result;
+}
+
+async function convertRow(row) {
   let newRow = {};
-  Object.keys(row).forEach(el => {
+  for (const el in row) {
     newRow[el] = row[el];
     if (row[el] instanceof Date) {
       newRow[el] = convertDate(row[el]);
     }
-  });
+
+    if (typeof(row[el]) === 'function') {
+      newRow[el] = await convertToBuffer(row[el]);
+    }
+  }
 
   return newRow;
 }
 
+async function convertToBuffer(blobFunction: BlobFunction): Promise<Buffer> {
+  return new Promise<Buffer>((resolve, reject) => {
+    blobFunction((err, name, e) => {
+      if (err) {
+        reject(err);
+      } else {
+        const dataChunks = [];
+        e.on('data', (data) => {
+          dataChunks.push(data);
+        });
+
+        e.on('end', () => {
+          resolve(Buffer.concat(dataChunks));
+        });
+      }
+    });
+  });
+}
+
+type BlobCallbackFunction = (err: Error | undefined, name: string, e: any) => void;
+type BlobFunction = (callback: BlobCallbackFunction) => void;
 
 exitHook(() => {
   Pool.destroy();

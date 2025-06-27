@@ -12,4 +12,4 @@ RUN npm ci
 
 EXPOSE 4444
 
-ENTRYPOINT [ "node", "src/main.js" ]
+ENTRYPOINT [ "node", "src/main.ts" ]

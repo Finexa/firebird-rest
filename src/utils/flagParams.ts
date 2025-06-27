@@ -1,4 +1,5 @@
 const flags = require('flags');
+import type {Options, SupportedCharacterSet} from 'node-firebird';
 
 flags.defineNumber('port', process.env.PORT || '4243', 'Port that app listens to');
 flags.defineString('h', '10.180.2.4', 'Firebird Host');
@@ -11,14 +12,17 @@ flags.defineString('r', 'level4', 'Firebird User Role');
 flags.parse();
 
 const options = () => {
-  return {
+  const firebirdOptions: Options = {
     host: process.env.FIREBIRD_HOST || flags.get('h'),
     port: process.env.FIREBIRD_PORT || flags.get('p'),
     database: process.env.FIREBIRD_DATABASE || flags.get('db'),
     user: process.env.FIREBIRD_USER || flags.get('u'),
     password: process.env.FIREBIRD_PASSWORD || flags.get('pw'),
-    role: process.env.FIREBIRD_ROLE || flags.get('r')
+    role: process.env.FIREBIRD_ROLE || flags.get('r'),
+    encoding: 'latin1' as SupportedCharacterSet,
   };
+
+  return firebirdOptions;
 };
 
 const serverPort = () => {
