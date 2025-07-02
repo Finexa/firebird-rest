@@ -1,14 +1,20 @@
-const Firebird = require('node-firebird');
+import * as Firebird from 'node-firebird';
 const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
 const parseDateStrings = require('./parseDateStrings');
 const exitHook = require('exit-hook');
 
-const Pool = Firebird.pool(50, Options);
+
+const POOL_MAX = 100;
+const POOL_HIGH_ALERT = Math.floor(POOL_MAX * 0.7);
+
+const pool = Firebird.pool(POOL_MAX, {
+  ...Options,
+}) as FirebirdConnectionPool;
 
 
-const sqlQuery = (param) => {
+export const sqlQuery = (param) => {
   return (req, res) => {
     let result = [];
     let properties;
@@ -41,7 +47,7 @@ const sqlQuery = (param) => {
       }
     }
 
-    Pool.get(function(err, db) {
+    pool.get(function(err, db) {
       if (err) {
         console.error(err);
         if (db) {
@@ -49,6 +55,10 @@ const sqlQuery = (param) => {
         }
         res.status(400); // BAD REQUEST
         return res.send(`\n${err.message}\n`);
+      }
+
+      if (pool.dbinuse > POOL_HIGH_ALERT) {
+        console.error(`ALERT: Connection pool using ${pool.dbinuse} of ${pool.max} connections.`)
       }
 
       if (isTransaction) {
@@ -64,21 +74,20 @@ const sqlQuery = (param) => {
             try {
               await executeTransactionQuery(transaction, { params: parseDateStrings(params), sql });
             } catch(err) {
+              db.detach();
+
               res.status(400);
               res.send(err.message);
-
-              db.detach();
               return;
             }
           }
 
           transaction.commit((err) => {
             if (err) {
-              res.status(400);
-              res.send(err.message);
-
-              transaction.rollback(() => {
+              transaction.rollback((err) => {
                 db.detach();
+                res.status(400);
+                res.send(err.message);
               });
             } else {
               res.status(200);
@@ -191,8 +200,11 @@ async function convertToBuffer(blobFunction: BlobFunction): Promise<Buffer> {
 type BlobCallbackFunction = (err: Error | undefined, name: string, e: any) => void;
 type BlobFunction = (callback: BlobCallbackFunction) => void;
 
-exitHook(() => {
-  Pool.destroy();
-})
+interface FirebirdConnectionPool extends Firebird.ConnectionPool {
+  max: number;
+  dbinuse: number;
+}
 
-module.exports = sqlQuery;
+exitHook(() => {
+  pool.destroy();
+})
