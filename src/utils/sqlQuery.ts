@@ -192,6 +192,10 @@ async function convertToBuffer(blobFunction: BlobFunction): Promise<Buffer> {
         e.on('end', () => {
           resolve(Buffer.concat(dataChunks));
         });
+
+        e.on('error', (err) => {
+          reject(err);
+        });
       }
     });
   });
