@@ -7,7 +7,7 @@ const exitHook = require('exit-hook');
 
 
 const POOL_MAX = 100;
-const POOL_HIGH_ALERT = Math.floor(POOL_MAX * 0.7);
+const POOL_HIGH_ALERT = Math.floor(POOL_MAX * 0.4);
 
 const pool = Firebird.pool(POOL_MAX, {
   ...Options,
