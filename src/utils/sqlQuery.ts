@@ -26,8 +26,6 @@ function sendStats() {
   zabbixSender.send((err, response, items) => {
     if (err) {
       console.error(err);
-    } else {
-      console.log(response);
     }
   });
 
