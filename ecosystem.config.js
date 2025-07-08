@@ -8,6 +8,7 @@ module.exports = {
         env: {
           PORT: 4243,
           PATH: `${process.env.HOME}/.bun/bin:${process.env.PATH}`,
+          INSTANCE_ID: "01",
         },
         time: true,
         interpreter: "bun",
@@ -20,6 +21,7 @@ module.exports = {
         env: {
           PORT: 4244,
           PATH: `${process.env.HOME}/.bun/bin:${process.env.PATH}`,
+          INSTANCE_ID: "02",
         },
         time: true,
         interpreter: "bun",

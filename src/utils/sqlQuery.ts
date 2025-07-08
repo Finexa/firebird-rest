@@ -5,6 +5,7 @@ const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
 const parseDateStrings = require('./parseDateStrings');
 const exitHook = require('exit-hook');
+import * as os from 'os';
 
 
 const POOL_MAX = 100;
@@ -16,7 +17,7 @@ const pool = Firebird.pool(POOL_MAX, {
 
 const zabbixSender = new ZabbixSender({
   host: process.env.ZABBIX_SERVER_HOST,
-  agentHost: process.env.ZABBIX_HOSTNAME,
+  agentHost: os.hostname() + '_' + process.env.INSTANCE_ID,
 });
 
 function sendStats() {
