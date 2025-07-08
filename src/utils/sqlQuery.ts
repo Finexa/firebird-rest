@@ -192,8 +192,6 @@ async function convertRow(row) {
       newRow[el] = convertDate(row[el]);
     }
 
-    throw new Error('Problem here...');
-
     if (typeof(row[el]) === 'function') {
       newRow[el] = await convertToBuffer(row[el]);
     }
