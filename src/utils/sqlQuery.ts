@@ -1,4 +1,5 @@
 import * as Firebird from 'node-firebird';
+import {ZabbixSender} from "./ZabbixSender";
 const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
@@ -13,6 +14,26 @@ const pool = Firebird.pool(POOL_MAX, {
   ...Options,
 }) as FirebirdConnectionPool;
 
+const zabbixSender = new ZabbixSender({
+  host: process.env.ZABBIX_SERVER_HOST,
+  agentHost: process.env.ZABBIX_HOSTNAME,
+});
+
+function sendStats() {
+  zabbixSender.addItem('firebird.pool.connections_in_use', pool.dbinuse);
+
+  zabbixSender.send((err, response, items) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(response);
+    }
+  });
+
+  setTimeout(sendStats, 5000);
+}
+
+sendStats();
 
 export const sqlQuery = (param) => {
   return (req, res) => {
@@ -90,10 +111,10 @@ export const sqlQuery = (param) => {
                 res.send(err.message);
               });
             } else {
+              db.detach();
+
               res.status(200);
               res.send('OK');
-
-              db.detach();
             }
           });
         })
@@ -112,7 +133,10 @@ export const sqlQuery = (param) => {
             return res.send(JSON.stringify({ healthy: true }));
           } else {
             convertRows(data)
-              .finally(() => db.detach())
+              .finally(() => {
+                db.detach();
+                console.log('Detached!');
+              })
               .then((result) => {
               let jsonString = bufferJson.stringify(result);
 
@@ -154,8 +178,7 @@ async function convertRows(data) {
         result.push(newRow);
       }
     } else {
-      const newRow = await convertRow(data) as any[];
-      result = newRow;
+      result = await convertRow(data) as any[];
     }
   }
 
@@ -169,6 +192,8 @@ async function convertRow(row) {
     if (row[el] instanceof Date) {
       newRow[el] = convertDate(row[el]);
     }
+
+    throw new Error('Problem here...');
 
     if (typeof(row[el]) === 'function') {
       newRow[el] = await convertToBuffer(row[el]);
