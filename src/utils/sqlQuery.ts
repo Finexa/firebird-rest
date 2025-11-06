@@ -3,7 +3,6 @@ import {ZabbixSender} from "./ZabbixSender";
 const Options = require('./flagParams').options();
 const convertDate = require('./convertDate');
 const bufferJson = require('buffer-json');
-const parseDateStrings = require('./parseDateStrings');
 const exitHook = require('exit-hook');
 import * as os from 'os';
 
@@ -92,7 +91,7 @@ export const sqlQuery = (param) => {
           for(const statement of statements) {
             const { params, sql } = statement;
             try {
-              await executeTransactionQuery(transaction, { params: parseDateStrings(params), sql });
+              await executeTransactionQuery(transaction, { params: params, sql });
             } catch(err) {
               db.detach();
 
@@ -118,7 +117,7 @@ export const sqlQuery = (param) => {
           });
         })
       } else {
-        const params = parseDateStrings(properties.params);
+        const params = properties.params;
         const sql = properties.sql;
         db.query(sql, params, (err, data) => {
           if (err) {
