@@ -133,7 +133,6 @@ export const sqlQuery = (param) => {
             convertRows(data)
               .finally(() => {
                 db.detach();
-                console.log('Detached!');
               })
               .then((result) => {
               let jsonString = bufferJson.stringify(result);
