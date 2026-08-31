@@ -49,7 +49,7 @@ export const sqlQuery = (param) => {
 
       if (properties.sharedKey !== process.env['FIREBIRD_SHARED_KEY']) {
         res.status(403);
-        res.send('Invalid shared credentials');
+        return res.send('Invalid shared credentials');
       }
     }
 
