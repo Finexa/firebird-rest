@@ -135,14 +135,19 @@ export const sqlQuery = (param) => {
                 db.detach();
               })
               .then((result) => {
-              let jsonString = bufferJson.stringify(result);
+                let jsonString = bufferJson.stringify(result);
 
-              if (jsonString === undefined) {
-                jsonString = '{}';
-              }
+                if (jsonString === undefined) {
+                  jsonString = '{}';
+                }
 
-              res.send(jsonString);
-            });
+                res.send(jsonString);
+              })
+              .catch((error) => {
+                console.error(error);
+                res.status(400);
+                res.send(`\n${error.message}\n`);
+              });
           }
         });
       }
