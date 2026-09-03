@@ -90,14 +90,13 @@ export class ZabbixSender {
      * @param {Object} callback.response - The parsed JSON response from the server, or an empty object if an error occurred.
      * @param {Array<Item>} callback.items - The items sent in the request.
      * @returns {void}
-     * @throws {Error} - If a socket error occurs or if the socket times out.
      */
     public send(callback: any) {
         callback = (typeof callback !== 'undefined') ? callback : () => { };
 
         // Create a new TCP socket
         let self = this,
-            error = false,
+            error: Error | null = null,
             items = this.items,
             data = this.prepareData(items, this._withTimestamps),
             client = new Net.Socket(),
@@ -120,13 +119,13 @@ export class ZabbixSender {
         });
 
         client.on('timeout', () => {
+            error = new Error('Socket timed out after ' + this._timeout / 1000 + ' seconds');
             client.destroy();
-            throw new Error('Socket timed out after' + this._timeout / 1000 + 'seconds')
         });
 
         client.on('error', (err) => {
+            error = new Error('Socket error: ' + err.message);
             client.destroy();
-            throw new Error('Socket error: ' + err.message)
         });
 
         client.on('close', () => {
