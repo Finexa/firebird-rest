@@ -1,15 +1,15 @@
-from node:14.17-slim
+FROM oven/bun:1
 
-RUN apt-get update
-RUN apt-get install -y git
-
-# Create app directory
 WORKDIR /usr/src/app
+
+RUN bun install -g pm2
+
+COPY package.json bun.lock ./
+
+RUN bun install --frozen-lockfile --production --ignore-scripts
 
 COPY . .
 
-RUN npm ci
+EXPOSE 4243
 
-EXPOSE 4444
-
-ENTRYPOINT [ "node", "src/main.ts" ]
+ENTRYPOINT [ "bun", "run", "start" ]
