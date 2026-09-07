@@ -76,6 +76,8 @@ export const sqlQuery = (param) => {
         return res.send(`\n${err.message}\n`);
       }
 
+      logConnectionErrors(db);
+
       if (pool.dbinuse > POOL_HIGH_ALERT) {
         console.error(`ALERT: Connection pool using ${pool.dbinuse} of ${pool.max} connections.`)
       }
@@ -176,6 +178,17 @@ export const sqlQuery = (param) => {
     });
   };
 };
+
+const connectionsWithErrorLogging = new WeakSet();
+
+function logConnectionErrors(db) {
+  if (connectionsWithErrorLogging.has(db)) {
+    return;
+  }
+  connectionsWithErrorLogging.add(db);
+
+  db.on('error', (error) => console.error('Firebird connection error:', error));
+}
 
 function executeTransactionQuery(transaction, statement) {
   const { sql, params } = statement;
