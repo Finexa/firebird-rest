@@ -16,6 +16,8 @@ const pool = Firebird.pool(POOL_MAX, {
   connectTimeout: CONNECT_TIMEOUT_MS,
 }) as FirebirdConnectionPool;
 
+pool.on('error', (error) => console.error('Firebird pool error:', error));
+
 const zabbixSender = new ZabbixSender({
   host: process.env.ZABBIX_SERVER_HOST,
   agentHost: os.hostname() + '_' + process.env.INSTANCE_ID,
