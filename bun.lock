@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "firebird-rest-pool",
@@ -12,7 +13,7 @@
         "fastify": "^2.14.0",
         "flags": "^0.1.3",
         "moment": "^2.29.0",
-        "node-firebird": "git+https://github.com/Finexa/node-firebird-latin1.git#2766256",
+        "node-firebird": "2.15.0",
         "winser": "^1.0.3",
       },
     },
@@ -31,8 +32,6 @@
     "atomic-sleep": ["atomic-sleep@1.0.0", "", {}, "sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ=="],
 
     "avvio": ["avvio@6.5.0", "", { "dependencies": { "archy": "^1.0.0", "debug": "^4.0.0", "fastq": "^1.6.0" } }, "sha512-BmzcZ7gFpyFJsW8G+tfQw8vJNUboA9SDkkHLZ9RAALhvw/rplfWwni8Ee1rA11zj/J7/E5EvZmweusVvTHjWCA=="],
-
-    "big-integer": ["big-integer@1.6.52", "", {}, "sha512-QxD8cf2eVqJOOz63z6JIN9BzvVs/dlySa5HGSBH5xtR8dPteIRQnBxxKqkNTiT6jbDTF6jAfrd4oMcND9RGbQg=="],
 
     "buffer-json": ["buffer-json@2.0.0", "", {}, "sha512-+jjPFVqyfF1esi9fvfUs3NqM0pH1ziZ36VP4hmA/y/Ssfo/5w5xHKfTw9BwQjoJ1w/oVtpLomqwUHKdefGyuHw=="],
 
@@ -80,15 +79,13 @@
 
     "light-my-request": ["light-my-request@3.8.0", "", { "dependencies": { "ajv": "^6.10.2", "cookie": "^0.4.0", "readable-stream": "^3.4.0", "set-cookie-parser": "^2.4.1" } }, "sha512-cIOWmNsgoStysmkzcv2EwvLwMb2hEm6oqKMerG/b5ey9F0we2Qony8cAZgBktmGPYUvPyKsDCzMcYU6fXbpWew=="],
 
-    "long": ["long@4.0.0", "", {}, "sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA=="],
-
     "middie": ["middie@4.1.0", "", { "dependencies": { "path-to-regexp": "^4.0.0", "reusify": "^1.0.2" } }, "sha512-eylPpZA+K3xO9kpDjagoPkEUkNcWV3EAo5OEz0MqsekUpT7KbnQkk8HNZkh4phx2vvOAmNNZuLRWF9lDDHPpVQ=="],
 
     "moment": ["moment@2.30.1", "", {}, "sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how=="],
 
     "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
 
-    "node-firebird": ["node-firebird@github:Finexa/node-firebird-latin1#2766256", { "dependencies": { "big-integer": "^1.6.48", "long": "^4.0.0" } }, "Finexa-node-firebird-latin1-2766256"],
+    "node-firebird": ["node-firebird@2.15.0", "", {}, "sha512-INefK1re/tZiu8jQRc5VRD1RM/TNiWghrhN0tYLiW0nDRk6ue25S6VeUJvWROXnLe0h7/3YZusZrcQb94az0/g=="],
 
     "path-to-regexp": ["path-to-regexp@4.0.5", "", {}, "sha512-l+fTaGG2N9ZRpCEUj5fG1VKdDLaiqwCIvPngpnxzREhcdobhZC4ou4w984HBu72DqAJ5CfcdV6tjqNOunfpdsQ=="],
 
