@@ -9,9 +9,11 @@ import * as os from 'os';
 
 const POOL_MAX = 100;
 const POOL_HIGH_ALERT = Math.floor(POOL_MAX * 0.4);
+const CONNECT_TIMEOUT_MS = 30_000;
 
 const pool = Firebird.pool(POOL_MAX, {
   ...Options,
+  connectTimeout: CONNECT_TIMEOUT_MS,
 }) as FirebirdConnectionPool;
 
 const zabbixSender = new ZabbixSender({
