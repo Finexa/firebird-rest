@@ -49,7 +49,7 @@ export const sqlQuery = (param) => {
 
       if (properties.sharedKey !== process.env['FIREBIRD_SHARED_KEY']) {
         res.status(403);
-        res.send('Invalid shared credentials');
+        return res.send('Invalid shared credentials');
       }
     }
 
@@ -75,6 +75,8 @@ export const sqlQuery = (param) => {
         res.status(400); // BAD REQUEST
         return res.send(`\n${err.message}\n`);
       }
+
+      logConnectionErrors(db);
 
       if (pool.dbinuse > POOL_HIGH_ALERT) {
         console.error(`ALERT: Connection pool using ${pool.dbinuse} of ${pool.max} connections.`)
@@ -119,36 +121,74 @@ export const sqlQuery = (param) => {
       } else {
         const params = properties.params;
         const sql = properties.sql;
-        db.query(sql, params, (err, data) => {
+
+        db.transaction(Firebird.ISOLATION_REPEATABLE_READ, (err, transaction) => {
           if (err) {
             db.detach();
             res.status(400); // BAD REQUEST
             return res.send(`\n${err.message}\n`);
           }
 
-          if (param === 'health') {
-            db.detach();
-            return res.send(JSON.stringify({ healthy: true }));
-          } else {
-            convertRows(data)
-              .finally(() => {
+          transaction.query(sql, params, (err, data) => {
+            if (err) {
+              return transaction.rollback(() => {
                 db.detach();
-              })
+                res.status(400);
+                res.send(`\n${err.message}\n`);
+              });
+            }
+
+            if (param === 'health') {
+              return transaction.commit(() => {
+                db.detach();
+                res.send(JSON.stringify({ healthy: true }));
+              });
+            }
+
+            convertRows(data, transaction)
               .then((result) => {
-              let jsonString = bufferJson.stringify(result);
+                let jsonString = bufferJson.stringify(result);
 
-              if (jsonString === undefined) {
-                jsonString = '{}';
-              }
+                if (jsonString === undefined) {
+                  jsonString = '{}';
+                }
 
-              res.send(jsonString);
-            });
-          }
+                transaction.commit((err) => {
+                  db.detach();
+
+                  if (err) {
+                    res.status(400);
+                    return res.send(`\n${err.message}\n`);
+                  }
+
+                  res.send(jsonString);
+                });
+              })
+              .catch((error) => {
+                console.error(error);
+                transaction.rollback(() => {
+                  db.detach();
+                  res.status(400);
+                  res.send(`\n${error.message}\n`);
+                });
+              });
+          });
         });
       }
     });
   };
 };
+
+const connectionsWithErrorLogging = new WeakSet();
+
+function logConnectionErrors(db) {
+  if (connectionsWithErrorLogging.has(db)) {
+    return;
+  }
+  connectionsWithErrorLogging.add(db);
+
+  db.on('error', (error) => console.error('Firebird connection error:', error));
+}
 
 function executeTransactionQuery(transaction, statement) {
   const { sql, params } = statement;
@@ -164,25 +204,25 @@ function executeTransactionQuery(transaction, statement) {
   });
 }
 
-async function convertRows(data) {
+async function convertRows(data, transaction) {
   let result: any;
   if (data) {
     if (Array.isArray(data)) {
       result = [];
       // CONVERT RAW QUERY RESULT AND RETURN JSON
       for (const row of data) {
-        const newRow = await convertRow(row);
+        const newRow = await convertRow(row, transaction);
         result.push(newRow);
       }
     } else {
-      result = await convertRow(data) as any[];
+      result = await convertRow(data, transaction) as any[];
     }
   }
 
   return result;
 }
 
-async function convertRow(row) {
+async function convertRow(row, transaction) {
   let newRow = {};
   for (const el in row) {
     newRow[el] = row[el];
@@ -191,16 +231,16 @@ async function convertRow(row) {
     }
 
     if (typeof(row[el]) === 'function') {
-      newRow[el] = await convertToBuffer(row[el]);
+      newRow[el] = await convertToBuffer(row[el], transaction);
     }
   }
 
   return newRow;
 }
 
-async function convertToBuffer(blobFunction: BlobFunction): Promise<Buffer> {
+async function convertToBuffer(blobFunction: BlobFunction, transaction): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
-    blobFunction((err, name, e) => {
+    blobFunction(transaction, (err, name, e) => {
       if (err) {
         reject(err);
       } else {
@@ -222,7 +262,7 @@ async function convertToBuffer(blobFunction: BlobFunction): Promise<Buffer> {
 }
 
 type BlobCallbackFunction = (err: Error | undefined, name: string, e: any) => void;
-type BlobFunction = (callback: BlobCallbackFunction) => void;
+type BlobFunction = (transaction: unknown, callback: BlobCallbackFunction) => void;
 
 interface FirebirdConnectionPool extends Firebird.ConnectionPool {
   max: number;
