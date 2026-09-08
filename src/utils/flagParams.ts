@@ -20,7 +20,6 @@ const options = () => {
     password: process.env.FIREBIRD_PASSWORD || flags.get('pw'),
     role: process.env.FIREBIRD_ROLE || flags.get('r'),
     encoding: 'ISO8859_1',
-    pluginName: 'Srp',
   };
 
   return firebirdOptions;
